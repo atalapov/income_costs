@@ -54,6 +54,7 @@ class API extends REST {
 			$param['_param']    = $param;
 			$param['_response'] = $this;
 			// do_action(array($rquest[0],$rquest[2]),);
+			// add_action('')
 			// var_dump(array($rquest[0],$rquest[1]));
 			$data = array(
 				'data' => $param

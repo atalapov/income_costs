@@ -8,19 +8,37 @@
 /**
  * 
  */
-// class income_costs
-// {
+class income_costs
+{
 	
-// 	public function __construct()
-// 	{
-// 	}
-// 	public static function items($param = array())
-// 	{
-// 		var_dump($param);
-// 	}
-// }
-add_action( "income_costs_items", "income_costs_items", 10, 1 );
-function income_costs_items($param){
-	var_dump($param);
+	public function __construct()
+	{
+		add_action(__CLASS__."_list",array($this,'list'),10,1);
+	}
+	public static function list($param = array())
+	{
+		global $db;
+		$income_costs = $db->get('income_costs');
+		$this->obj = $param['_response'];
+		$obj = $this->obj;
+		$resp = $obj->response(
+			$obj->json(
+				array(
+					"METADATA" => 
+					array(
+						"PARAM" => $income_costs,
+						"DATA" => array(
+							"PARAM" => $param
+						)
+					)
+				)
+			),
+			200
+		);
+	}
 }
-// $income_costs = new income_costs();
+// add_action( "income_costs_items", "income_costs_items", 10, 1 );
+// function income_costs_items($param){
+// 	var_dump($param);
+// }
+$income_costs = new income_costs();

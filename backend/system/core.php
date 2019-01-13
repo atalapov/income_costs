@@ -6,6 +6,9 @@
 /**
  * Class Core run system
  */
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 if(!defined('SHSYS')){
     die('No access');
 }
@@ -14,6 +17,7 @@ class Core
     protected $libpath = "";
     protected $corepath = "";
     protected $Hook = null;
+    protected $config_filename = null;
     public function __construct()
     {
         $this->corepath = dirname(__FILE__).DIRECTORY_SEPARATOR;
@@ -27,7 +31,7 @@ class Core
     public function check_config_file($file_exist){
         $config_filename = apply_filters('get_database_config_file_name','config.php');
         if(file_exists(SHPATH.$config_filename)){
-            $file_exist = true;
+            $file_exist = SHPATH.$config_filename;
         }
         return $file_exist;
     }
@@ -36,21 +40,21 @@ class Core
         if(!$conf_exict){
             do_action('install_databace_config_file');
         }else{
+            require_once $conf_exict;
             $config = apply_filters( 'get_database_conf', array() );
             $this->load("core".DIRECTORY_SEPARATOR.'PHP-MySQLi-Database-Class'.DIRECTORY_SEPARATOR.'MysqliDb.php',null,'core');
             $default = array(
-                    'host' => '',
+                    'host' => 'localhost',
                     'username' => '', 
                     'password' => '',
                     'db'=> '',
-                    'port' => 3306,
                     'prefix'  => '',
                     'charset' => 'utf8'
                 );
             $options = array_merge($default,$config);
             $db = new MysqliDb($options);
             if($db){
-                $GLOBALS['DB'] = $db;
+                $GLOBALS['db'] = $db;
                 do_action('run_shsystem');
             }
         }

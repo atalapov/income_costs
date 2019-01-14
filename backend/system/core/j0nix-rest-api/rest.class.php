@@ -18,7 +18,7 @@ class REST {
 	}
 
 	//respond result
-	protected function response($data,$status){
+	public function response($data,$status){
 		$this->_code = ($status)?$status:200;
 		$this->setHeaders();
 		echo $data;
@@ -161,7 +161,7 @@ class REST {
 		return $result;
 	}
 	// make it all as json
-	protected function json($data){
+	public function json($data){
 		if(is_array($data)){
 			if($this->_prettyPrint === true) return $this->prettyJSON(json_encode($data)); //Pretty?
 			else return json_encode($data);

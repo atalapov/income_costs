@@ -19,7 +19,6 @@ class income_costs
 	{
 		global $db;
         $income_costs = $db->get('income_costs');
-        
         $this->obj = $param['_response'];
 		$obj = $param["_response"];
         $obj->response($obj->json($income_costs),200);

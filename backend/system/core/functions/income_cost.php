@@ -18,23 +18,11 @@ class income_costs
 	public static function list($param = array())
 	{
 		global $db;
-		$income_costs = $db->get('income_costs');
-		$this->obj = $param['_response'];
-		$obj = $this->obj;
-		$resp = $obj->response(
-			$obj->json(
-				array(
-					"METADATA" => 
-					array(
-						"PARAM" => $income_costs,
-						"DATA" => array(
-							"PARAM" => $param
-						)
-					)
-				)
-			),
-			200
-		);
+        $income_costs = $db->get('income_costs');
+        
+        $this->obj = $param['_response'];
+		$obj = $param["_response"];
+        $obj->response($obj->json($income_costs),200);
 	}
 }
 // add_action( "income_costs_items", "income_costs_items", 10, 1 );

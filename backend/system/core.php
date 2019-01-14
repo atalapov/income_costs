@@ -12,8 +12,7 @@ error_reporting(E_ALL);
 if(!defined('SHSYS')){
     die('No access');
 }
-class Core
-{
+class Core{
     protected $libpath = "";
     protected $corepath = "";
     protected $Hook = null;

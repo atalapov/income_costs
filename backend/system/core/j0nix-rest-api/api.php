@@ -48,17 +48,13 @@ class API extends REST {
 
 	public function processRequest(){
 		if(!empty($this->_request['rquest'])) {
-			$param = $this->_request;
-			$rquest = $this->_request["rquest"];
-			$rquest = explode("/", $rquest); 
-			$param['_param']    = $param;
+            $rquest = $this->_request["rquest"];
+            unset($this->_request["rquest"]);
+            $param = $this->_request;
+            $rquest = explode("/", $rquest);
+            unset($param["rquest"]);
+			$param['data']    = $param;
 			$param['_response'] = $this;
-			// do_action(array($rquest[0],$rquest[2]),);
-			// add_action('')
-			// var_dump(array($rquest[0],$rquest[1]));
-			$data = array(
-				'data' => $param
-			);			
 			do_action("{$rquest[0]}_{$rquest[1]}", $param);
 		}
 	}

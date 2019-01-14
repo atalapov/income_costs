@@ -16,8 +16,8 @@
 									:name="operationitem.value"
 									:value="operationitem.value"
 									></v-radio>
-								</template>									
-							</v-radio-group>	
+								</template>
+							</v-radio-group>
 							<div v-if="checkNote() == 'income'">
 								<h2 class="font-weight-light toleft">Выберите категорию доходов:</h2>
 								<v-radio-group v-model="selectedcat">
@@ -45,22 +45,22 @@
 										></v-radio>
 									</template>
 								</v-radio-group>
-							</div>	
+							</div>
 							<div v-if="checkCI() != ''">
-								<h2 class="font-weight-light toleft">Напишите название:</h2>	
-								<v-text-field								
-								placeholder="Название элемента"		
-								name="elementname"						
-								></v-text-field>
-								<h2 class="font-weight-light toleft">Сумма:</h2>	
-								<v-text-field								
-								placeholder="Введите сумму"	
-								name="summary"							
-								></v-text-field>
+								<h2 class="font-weight-light toleft">Выберите дату:</h2>
+								<v-menu :close-on-content-click="false" v-model="menu" :nudge-right="40" lazy transition="scale-transition" offset-y full-width min-width="290px">
+									<v-text-field slot="activator" v-model="computedDateFormatted" prepend-icon="event" readonly></v-text-field>
+									<v-date-picker locale="ru-ru" v-model="date" @input="menu = false"></v-date-picker>
+								</v-menu>
+								<p>Date in ISO format: <strong>{{ date }}</strong></p>
+								<h2 class="font-weight-light toleft">Напишите название:</h2>
+								<v-text-field placeholder="Название элемента" name="elementname" ></v-text-field>
+								<h2 class="font-weight-light toleft">Сумма:</h2>
+								<v-text-field placeholder="Введите сумму" name="summary" ></v-text-field>
 								<div>
 									<v-btn color="warning" type="submit">Отправить</v-btn>
 								</div>
-							</div>				
+							</div>
 						</v-form>
 					</v-flex>
 				</v-card>
@@ -69,11 +69,13 @@
 	</v-container>
 </template>
 
-<script>	
+<script>
 	export default {
 		name: 'AddPayment',
-		data: function() {
+		data: function() {	
 			return {
+				date: new Date().toISOString().substr(0, 10),
+				menu: false,
 				selected: '',
 				selectedcat: '',
 				operationitems : [],
@@ -81,56 +83,66 @@
 				operationcatcosts : []
 			};
 		},
-		// created() {
-		// 	axios.get(`http://vue/data.json`)
-		// 	.then(response => {
-		// 	    // JSON responses are automatically parsed.
-		// 	    this.posts = response.data })
-		// 	.catch(e => {
-		// 		this.errors.push(e)
-		// 	})
-		// },
-		mounted: function() {
-			var self = this;
-			setTimeout(function(self) {			
-				self.operationitems = [{
-					name: 'Доходы',
-					value: 'income'
-				}, {
-					name: 'Расходы',
-					value: 'costs'
-				}, ];
-				self.operationcatins = [{
-					name: 'Зарплата',
-					value: 'salary'
-				}, {
-					name: 'Халтура',
-					value: 'quickmoney'
-				}, {
-					name: 'Подарок',
-					value: 'gift'
-				}];
-				self.operationcatcosts = [{
-					name: 'Покупка продуктов',
-					value: 'products'
-				}, {
-					name: 'Транспортные расходы',
-					value: 'transport'
-				}, {
-					name: 'Подарки',
-					value: 'giftcost'
-				}];
-			}, 0, self);
-		},
-		methods: {
-			checkNote: function() {
-				return this.selected;
-			},
-			checkCI: function() {
-				return this.selectedcat;
+		computed: {
+			computedDateFormatted () {
+				return this.formatDate(this.date)
 			}
-		}
+		},
+// created() {
+// axios.get(`http://vue/data.json`)
+// .then(response => {
+//     // JSON responses are automatically parsed.
+//     this.posts = response.data })
+// .catch(e => {
+// this.errors.push(e)
+// })
+// },
+mounted: function() {
+	var self = this;
+	setTimeout(function(self) {
+		self.operationitems = [{
+			name: 'Доходы',
+			value: 'income'
+		}, {
+			name: 'Расходы',
+			value: 'costs'
+		}, ];
+		self.operationcatins = [{
+			name: 'Зарплата',
+			value: 'salary'
+		}, {
+			name: 'Халтура',
+			value: 'quickmoney'
+		}, {
+			name: 'Подарок',
+			value: 'gift'
+		}];
+		self.operationcatcosts = [{
+			name: 'Покупка продуктов',
+			value: 'products'
+		}, {
+			name: 'Транспортные расходы',
+			value: 'transport'
+		}, {
+			name: 'Подарки',
+			value: 'giftcost'
+		}];
+	}, 0, self);
+},
+methods: {
+	checkNote: function() {
+		return this.selected;
+	},
+	checkCI: function() {
+		return this.selectedcat;
+	},
+	formatDate (date) {
+		if (!date) return null
+		const [year, month, day] = date.split('-')
+		return `${day}.${month}.${year}`
 	}
+}
+}
 </script>
 
 <style lang="css" scoped>

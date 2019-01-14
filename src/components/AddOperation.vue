@@ -2,7 +2,7 @@
 	<v-container grid-list-md text-xs-center>
 		<v-layout row wrap>
 			<v-flex xs12 sm6 offset-sm3>
-				<v-card color="primary">
+				<v-card>
 					<v-flex xs12 md10 offset-md1>
 						<h1 class="font-weight-light">Нужно заполнить форму для добавления операции</h1>
 						<v-form class="operationform">
@@ -20,7 +20,7 @@
 							</v-radio-group>	
 							<div v-if="checkNote() == 'income'">
 								<h2 class="font-weight-light toleft">Выберите категорию доходов:</h2>
-								<v-radio-group v-model="selectedcatin">
+								<v-radio-group v-model="selectedcat">
 									<template v-for="operationcatin in operationcatins">
 										<v-radio 
 										class="title"
@@ -34,7 +34,7 @@
 							</div>
 							<div v-if="checkNote() == 'costs'">
 								<h2 class="font-weight-light toleft">Выберите категорию расходов:</h2>
-								<v-radio-group v-model="selectedcatcost">
+								<v-radio-group v-model="selectedcat">
 									<template v-for="operationcatcost in operationcatcosts">
 										<v-radio 
 										class="title"
@@ -45,7 +45,22 @@
 										></v-radio>
 									</template>
 								</v-radio-group>
-							</div>							
+							</div>	
+							<div v-if="checkCI() != ''">
+								<h2 class="font-weight-light toleft">Напишите название:</h2>	
+								<v-text-field								
+								placeholder="Название элемента"		
+								name="elementname"						
+								></v-text-field>
+								<h2 class="font-weight-light toleft">Сумма:</h2>	
+								<v-text-field								
+								placeholder="Введите сумму"	
+								name="summary"							
+								></v-text-field>
+								<div>
+									<v-btn color="warning" type="submit">Отправить</v-btn>
+								</div>
+							</div>				
 						</v-form>
 					</v-flex>
 				</v-card>
@@ -60,22 +75,21 @@
 		data: function() {
 			return {
 				selected: '',
-				selectedcatin: '',
-				selectedcatcost: '',
+				selectedcat: '',
 				operationitems : [],
 				operationcatins : [],
 				operationcatcosts : []
 			};
 		},
-		created() {
-			axios.get(`http://vue/data.json`)
-			.then(response => {
-			    // JSON responses are automatically parsed.
-			    this.posts = response.data })
-			.catch(e => {
-				this.errors.push(e)
-			})
-		},
+		// created() {
+		// 	axios.get(`http://vue/data.json`)
+		// 	.then(response => {
+		// 	    // JSON responses are automatically parsed.
+		// 	    this.posts = response.data })
+		// 	.catch(e => {
+		// 		this.errors.push(e)
+		// 	})
+		// },
 		mounted: function() {
 			var self = this;
 			setTimeout(function(self) {			
@@ -109,8 +123,11 @@
 			}, 0, self);
 		},
 		methods: {
-			checkNote: function() {			
+			checkNote: function() {
 				return this.selected;
+			},
+			checkCI: function() {
+				return this.selectedcat;
 			}
 		}
 	}

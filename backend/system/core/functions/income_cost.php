@@ -28,8 +28,17 @@ class income_costs
 		global $db;
         $obj = $param["_response"];
         $data = $param["data"];
-        $id = $db->insert ('income_costs', $data);
-        $obj->response($obj->json(array('last_id'=>$id)),200);
+        if(!empty($data)){
+	        if(isset($data['date'])) {
+	        	$data['date'] = date('Y-m-d H:i:s',strtotime($data['date']));
+	        }else{
+	        	$data['date'] = date('Y-m-d H:i:s');
+	        }
+	        $id = $db->insert('income_costs', $data);
+        	$obj->response($obj->json(array('id'=>$id)),200);
+        }else{
+        	$obj->response($obj->json(array('error'=>'Data can\'t be empty!' )),404);
+        }
 	}
 }
 // add_action( "income_costs_items", "income_costs_items", 10, 1 );

@@ -2,9 +2,9 @@
 	<v-container grid-list-md text-xs-center>
 		<v-layout row wrap>
 			<v-flex xs12 sm6 offset-sm3>
+				<h1 class="font-weight-light mb-20">Нужно заполнить форму для добавления операции</h1>				
 				<v-card>
-					<v-flex xs12 md10 offset-md1>
-						<h1 class="font-weight-light">Нужно заполнить форму для добавления операции</h1>
+					<v-flex xs12 md10 offset-md1>					
 						<v-form class="operationform">
 							<h2 class="font-weight-light toleft">Выберите тип операции:</h2>
 							<v-radio-group v-model="selected">
@@ -69,11 +69,12 @@
 	</v-container>
 </template>
 
-<script>
+<script>	
 	export default {
 		name: 'AddPayment',
 		data: function() {	
 			return {
+				currency:{},
 				date: new Date().toISOString().substr(0, 10),
 				menu: false,
 				selected: '',
@@ -88,15 +89,23 @@
 				return this.formatDate(this.date)
 			}
 		},
-// created() {
-// axios.get(`http://vue/data.json`)
-// .then(response => {
-//     // JSON responses are automatically parsed.
-//     this.posts = response.data })
-// .catch(e => {
-// this.errors.push(e)
-// })
-// },
+		created() {
+			axios.get(`https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5`)
+			.then(response => {
+			// JSON responses are automatically parsed.    
+			for (var k in response.data) {
+				var smdata = response.data[k];
+				this.currency[smdata.ccy] = smdata.buy;
+				// =25/0.39500
+				// if(smdata.ccy)
+				// currency = response.data[k]
+			}
+			console.log(this.currency);
+    		})
+			.catch(e => {
+				this.errors.push(e)
+			})
+		},
 mounted: function() {
 	var self = this;
 	setTimeout(function(self) {
@@ -146,6 +155,9 @@ methods: {
 </script>
 
 <style lang="css" scoped>
+.mb-20 {
+	margin-bottom: 20px;
+}
 h2 {
 	font-size: 20px;
 }

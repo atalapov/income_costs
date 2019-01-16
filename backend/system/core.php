@@ -86,6 +86,6 @@ class Core{
         $this->load("core".DIRECTORY_SEPARATOR.'j0nix-rest-api'.DIRECTORY_SEPARATOR.'api.php',null,'core');
     }
 }
-
+header('Access-Control-Allow-Origin: *');
 $core = new Core();
 $GLOBALS['core'] = $core;

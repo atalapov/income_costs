@@ -2,6 +2,7 @@
 	<v-container grid-list-md text-xs-center>
 		<v-layout row wrap>
 			<v-flex xs12 sm6 offset-sm3>
+				<h3 class="font-weight-light">Курс валют:</h3>
 				<h1 class="font-weight-light mb-20">Нужно заполнить форму для добавления операции</h1>				
 				<v-card>
 					<v-flex xs12 md10 offset-md1>					
@@ -54,12 +55,16 @@
 								</v-menu>
 								<p>Date in ISO format: <strong>{{ date }}</strong></p>
 								<h2 class="font-weight-light toleft">Напишите название:</h2>
-								<v-text-field placeholder="Название элемента" name="elementname" ></v-text-field>
+								<v-text-field placeholder="Название элемента" name="elementname" ></v-text-field>								
+								<h2 class="font-weight-light toleft">Выберите валюту:</h2>
+								<v-select :items="incomecurrency" item-text="type" item-value="value" v-model="defaultcurrency">				
+								</v-select>
 								<h2 class="font-weight-light toleft">Сумма:</h2>
-								<v-text-field placeholder="Введите сумму" name="summary" ></v-text-field>
+								<v-text-field placeholder="Введите сумму" name="summary" ></v-text-field>	
 								<div>
 									<v-btn color="warning" type="submit">Отправить</v-btn>
 								</div>
+								
 							</div>
 						</v-form>
 					</v-flex>
@@ -74,11 +79,31 @@
 		name: 'AddPayment',
 		data: function() {	
 			return {
-				currency:{},
+				currencies:{},
+				currencieslist:new Array(),
 				date: new Date().toISOString().substr(0, 10),
 				menu: false,
+				defaultcurrency: {
+					type:'UAH',
+					value:'UAH'
+				},
+				incomecurrency: [
+				{
+					type:'UAH',
+					value:'UAH'
+				},
+				{
+					type:'USD',
+					value:'USD'
+				},
+				{
+					type:'RUR',
+					value:'RUR'
+				}
+				],
 				selected: '',
 				selectedcat: '',
+				selectedcurr: '',
 				operationitems : [],
 				operationcatins : [],
 				operationcatcosts : []
@@ -90,68 +115,72 @@
 			}
 		},
 		created() {
-			axios.get(`https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5`)
+			axios.get('https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5')
 			.then(response => {
 			// JSON responses are automatically parsed.    
 			for (var k in response.data) {
-				var smdata = response.data[k];
-				this.currency[smdata.ccy] = smdata.buy;
+				var smdata = response.data[k];				
+				this.currencies[smdata.ccy] = {};
+				this.currencies[smdata.ccy].ccy  = smdata.ccy;
+				this.currencies[smdata.ccy].buy  = smdata.buy;
+				this.currencies[smdata.ccy].sale = smdata.sale;
+				var currencies = this.currencies;
+				this.currencieslist.push(this.currencies[smdata.ccy]);
 				// =25/0.39500
 				// if(smdata.ccy)
 				// currency = response.data[k]
-			}
-			console.log(this.currency);
-    		})
+			}			
+		})
 			.catch(e => {
 				this.errors.push(e)
 			})
 		},
-mounted: function() {
-	var self = this;
-	setTimeout(function(self) {
-		self.operationitems = [{
-			name: 'Доходы',
-			value: 'income'
-		}, {
-			name: 'Расходы',
-			value: 'costs'
-		}, ];
-		self.operationcatins = [{
-			name: 'Зарплата',
-			value: 'salary'
-		}, {
-			name: 'Халтура',
-			value: 'quickmoney'
-		}, {
-			name: 'Подарок',
-			value: 'gift'
-		}];
-		self.operationcatcosts = [{
-			name: 'Покупка продуктов',
-			value: 'products'
-		}, {
-			name: 'Транспортные расходы',
-			value: 'transport'
-		}, {
-			name: 'Подарки',
-			value: 'giftcost'
-		}];
-	}, 0, self);
-},
-methods: {
-	checkNote: function() {
-		return this.selected;
-	},
-	checkCI: function() {
-		return this.selectedcat;
-	},
-	formatDate (date) {
-		if (!date) return null
-		const [year, month, day] = date.split('-')
-		return `${day}.${month}.${year}`
+		mounted: function() {
+			var self = this;
+			setTimeout(function(self) {
+				self.operationitems = [{
+					name: 'Доходы',
+					value: 'income'
+				}, {
+					name: 'Расходы',
+					value: 'costs'
+				}, ];
+				self.operationcatins = [{
+					name: 'Зарплата',
+					value: 'salary'
+				}, {
+					name: 'Халтура',
+					value: 'quickmoney'
+				}, {
+					name: 'Подарок',
+					value: 'gift'
+				}];
+				self.operationcatcosts = [{
+					name: 'Покупка продуктов',
+					value: 'products'
+				}, {
+					name: 'Транспортные расходы',
+					value: 'transport'
+				}, {
+					name: 'Подарки',
+					value: 'giftcost'
+				}];
+			}, 0, self);
+		},
+		methods: {
+			checkNote: function() {
+				return this.selected;
+			},
+			checkCI: function() {
+				return this.selectedcat;
+			},
+			formatDate (date) {
+				if (!date) return null
+					const [year, month, day] = date.split('-')
+				return `${day}.${month}.${year}`
+			}
+		}
 	}
-}
-}
 </script>
 
 <style lang="css" scoped>

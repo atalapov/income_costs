@@ -80,6 +80,14 @@ class Core{
                 require_once $folder.DIRECTORY_SEPARATOR.$file;
             }
         }
+        $folder = $this->corepath.'core'.DIRECTORY_SEPARATOR.'controllers';
+        $files = scandir($folder);
+        foreach ($files as $file) {
+            $file = ($file != '.' && $file !='..' && $file != 'index.php' && strpos($file,'.php') > 0) ? $file : '';
+            if(!empty($file) && is_file($folder.DIRECTORY_SEPARATOR.$file)){
+                require_once $folder.DIRECTORY_SEPARATOR.$file;
+            }
+        }
     }
     public function run_api()
     {

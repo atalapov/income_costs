@@ -3,19 +3,19 @@
 		<v-layout row wrap>
 			<v-flex xs12 sm6 offset-sm3>
 				<h3 class="font-weight-light">Курс валют:</h3>
-				<h1 class="font-weight-light mb-20">Нужно заполнить форму для добавления операции</h1>				
+				<h1 class="font-weight-light mb-20">Нужно заполнить форму для добавления операции</h1>
 				<v-card>
 					<v-flex xs12 md10 offset-md1>					
 						<v-form class="operationform">
 							<h2 class="font-weight-light toleft">Выберите тип операции:</h2>
-							<v-radio-group v-model="selected">
+							<v-radio-group v-model="type">
 								<template v-for="operationitem in operationitems">
 									<v-radio 
 									class="title"
 									color="orange"
-									:label="operationitem.name" 
-									:name="operationitem.value"
-									:value="operationitem.value"
+									:label="operationitem.title" 
+									:name="operationitem.slug"
+									:value="operationitem.slug"
 									></v-radio>
 								</template>
 							</v-radio-group>
@@ -26,9 +26,9 @@
 										<v-radio 
 										class="title"
 										color="orange"
-										:label="operationcatin.name" 
-										:name="operationcatin.value"
-										:value="operationcatin.value"
+										:label="operationcatin.title" 
+										:name="operationcatin.slug"
+										:value="operationcatin.slug"
 										></v-radio>
 									</template>
 								</v-radio-group>
@@ -40,9 +40,9 @@
 										<v-radio 
 										class="title"
 										color="orange"
-										:label="operationcatcost.name" 
-										:name="operationcatcost.value"
-										:value="operationcatcost.value"
+										:label="operationcatcost.title" 
+										:name="operationcatcost.slug"
+										:value="operationcatcost.slug"
 										></v-radio>
 									</template>
 								</v-radio-group>
@@ -55,14 +55,14 @@
 								</v-menu>
 								<p>Date in ISO format: <strong>{{ date }}</strong></p>
 								<h2 class="font-weight-light toleft">Напишите название:</h2>
-								<v-text-field placeholder="Название элемента" name="elementname" ></v-text-field>								
+								<v-text-field placeholder="Название элемента" name="elementname" v-model="title"></v-text-field>	
 								<h2 class="font-weight-light toleft">Выберите валюту:</h2>
-								<v-select :items="incomecurrency" item-text="type" item-value="value" v-model="defaultcurrency">				
+								<v-select :items="incomecurrency" item-text="type" item-value="value" v-model="defaultcurrency" >	
 								</v-select>
 								<h2 class="font-weight-light toleft">Сумма:</h2>
-								<v-text-field placeholder="Введите сумму" name="summary" ></v-text-field>	
+								<v-text-field placeholder="Введите сумму" name="summary" v-model="sum"></v-text-field>	
 								<div>
-									<v-btn color="warning" type="submit">Отправить</v-btn>
+									<v-btn color="warning" @click="submit">Отправить</v-btn>
 								</div>
 								
 							</div>
@@ -79,9 +79,12 @@
 		name: 'AddPayment',
 		data: function() {	
 			return {
-				currencies:{},
+				currencies:{},				
+				categories:{},		
 				currencieslist:new Array(),
 				date: new Date().toISOString().substr(0, 10),
+				title: '',
+				sum:'',
 				menu: false,
 				defaultcurrency: {
 					type:'UAH',
@@ -101,75 +104,138 @@
 					value:'RUR'
 				}
 				],
-				selected: '',
+				type: '',
 				selectedcat: '',
-				selectedcurr: '',
 				operationitems : [],
 				operationcatins : [],
 				operationcatcosts : []
 			};
 		},
 		computed: {
-			computedDateFormatted () {
+			computedDateFormatted() {
 				return this.formatDate(this.date)
+			},
+			// categoriesupdate() {
+			// }
+		},
+		watch: {
+			categories: function(val){
+				this.updateCategories();
 			}
 		},
-		created() {
+		mounted: function() {
+		var self = this;		
+			axios.get('http://vue/backend/categories/list').then(response => {
+				self.categories = response.data;
+			});
 			axios.get('https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5')
 			.then(response => {
-			// JSON responses are automatically parsed.    
-			for (var k in response.data) {
-				var smdata = response.data[k];				
-				this.currencies[smdata.ccy] = {};
-				this.currencies[smdata.ccy].ccy  = smdata.ccy;
-				this.currencies[smdata.ccy].buy  = smdata.buy;
-				this.currencies[smdata.ccy].sale = smdata.sale;
-				var currencies = this.currencies;
-				this.currencieslist.push(this.currencies[smdata.ccy]);
-				// =25/0.39500
-				// if(smdata.ccy)
-				// currency = response.data[k]
-			}			
-		})
-			.catch(e => {
-				this.errors.push(e)
+				for (var k in response.data) {
+					var smdata = response.data[k];				
+					self.currencies[smdata.ccy] = {};
+					self.currencies[smdata.ccy].ccy  = smdata.ccy;
+					self.currencies[smdata.ccy].buy  = smdata.buy;
+					self.currencies[smdata.ccy].sale = smdata.sale;
+					var currencies = this.currencies;
+					self.currencieslist.push(this.currencies[smdata.ccy]);
+				}			
 			})
-		},
-		mounted: function() {
-			var self = this;
-			setTimeout(function(self) {
-				self.operationitems = [{
-					name: 'Доходы',
-					value: 'income'
-				}, {
-					name: 'Расходы',
-					value: 'costs'
-				}, ];
-				self.operationcatins = [{
-					name: 'Зарплата',
-					value: 'salary'
-				}, {
-					name: 'Халтура',
-					value: 'quickmoney'
-				}, {
-					name: 'Подарок',
-					value: 'gift'
-				}];
-				self.operationcatcosts = [{
-					name: 'Покупка продуктов',
-					value: 'products'
-				}, {
-					name: 'Транспортные расходы',
-					value: 'transport'
-				}, {
-					name: 'Подарки',
-					value: 'giftcost'
-				}];
-			}, 0, self);
+			// setTimeout(function(self) {
+			// 	self.operationitems = [{
+			// 		name: 'Доходы',
+			// 		value: 'income'
+			// 	}, {
+			// 		name: 'Расходы',
+			// 		value: 'costs'
+			// 	}, ];
+			// 	self.operationcatins = [{
+			// 		name: 'Зарплата',
+			// 		value: 'salary'
+			// 	}, {
+			// 		name: 'Халтура',
+			// 		value: 'quickmoney'
+			// 	}, {
+			// 		name: 'Подарок',
+			// 		value: 'gift'
+			// 	}];
+			// 	self.operationcatcosts = [{
+			// 		name: 'Покупка продуктов',
+			// 		value: 'products'
+			// 	}, {
+			// 		name: 'Транспортные расходы',
+			// 		value: 'transport'
+			// 	}, {
+			// 		name: 'Подарки',
+			// 		value: 'giftcost'
+			// 	}];
+			// }, 0, self);
 		},
 		methods: {
+			updateCategories: function() {
+				var cat = this.categories;
+				this.operationitems = [];
+				this.operationcatins = [];
+				this.operationcatcosts = [];
+				for (var i in cat) {
+					if(typeof cat[i].parent != 'number'){
+						var data = {
+							id    : cat[i].ID,
+							slug  : cat[i].slug,
+							title : cat[i].title
+						};
+						this.operationitems.push(data);
+					}
+				}
+				for (var i in cat) {
+					if(cat[i].parent == 1){
+						var data = {
+							id    : cat[i].ID,
+							slug  : cat[i].slug,
+							title : cat[i].title
+						};
+						this.operationcatins.push(data);
+					}
+				}
+				for (var i in cat) {
+					if(cat[i].parent == 2){
+						var data = {
+							id    : cat[i].ID,
+							slug  : cat[i].slug,
+							title : cat[i].title
+						};
+						this.operationcatcosts.push(data);
+					}
+				}
+				return cat;
+			},
+			submit () {
+				console.log(this.date, this.type, this.selectedcat, this.title, this.sum, this.defaultcurrency);
+				var currency = 0;
+				var datasend = {
+
+				};
+				datasend.type  = this.type;
+				datasend.title = this.title;
+				datasend.date  = this.date;
+				if(this.defaultcurrency != 'UAH' && this.currencies[this.defaultcurrency]){
+					currency = this.currencies[this.defaultcurrency].buy;
+				}
+				console.log(currency);
+				if(currency !== 0){
+					datasend.sum = this.sum*currency;
+				}
+				console.log(datasend.sum);
+				// axios.get('http://vue/backend/income_costs/add', {					
+				// 	date: this.date,
+				// 	type: this.selected,
+				// })
+				// .then(response => {		
+				// 	console.log(response.data);	
+				// })			
+			},
 			checkNote: function() {
-				return this.selected;
+				console.log(this.type);
+				return this.type;
 			},
 			checkCI: function() {
 				return this.selectedcat;
@@ -178,7 +244,7 @@
 				if (!date) return null
 					const [year, month, day] = date.split('-')
 				return `${day}.${month}.${year}`
-			}
+			},
 		}
 	}
 </script>

@@ -28,7 +28,7 @@
 										color="orange"
 										:label="operationcatin.title" 
 										:name="operationcatin.slug"
-										:value="operationcatin.slug"
+										:value="operationcatin.id"
 										></v-radio>
 									</template>
 								</v-radio-group>
@@ -42,7 +42,7 @@
 										color="orange"
 										:label="operationcatcost.title" 
 										:name="operationcatcost.slug"
-										:value="operationcatcost.slug"
+										:value="operationcatcost.id"
 										></v-radio>
 									</template>
 								</v-radio-group>
@@ -115,8 +115,6 @@
 			computedDateFormatted() {
 				return this.formatDate(this.date)
 			},
-			// categoriesupdate() {
-			// }
 		},
 		watch: {
 			categories: function(val){
@@ -140,35 +138,6 @@
 					self.currencieslist.push(this.currencies[smdata.ccy]);
 				}			
 			})
-			// setTimeout(function(self) {
-			// 	self.operationitems = [{
-			// 		name: 'Доходы',
-			// 		value: 'income'
-			// 	}, {
-			// 		name: 'Расходы',
-			// 		value: 'costs'
-			// 	}, ];
-			// 	self.operationcatins = [{
-			// 		name: 'Зарплата',
-			// 		value: 'salary'
-			// 	}, {
-			// 		name: 'Халтура',
-			// 		value: 'quickmoney'
-			// 	}, {
-			// 		name: 'Подарок',
-			// 		value: 'gift'
-			// 	}];
-			// 	self.operationcatcosts = [{
-			// 		name: 'Покупка продуктов',
-			// 		value: 'products'
-			// 	}, {
-			// 		name: 'Транспортные расходы',
-			// 		value: 'transport'
-			// 	}, {
-			// 		name: 'Подарки',
-			// 		value: 'giftcost'
-			// 	}];
-			// }, 0, self);
 		},
 		methods: {
 			updateCategories: function() {
@@ -209,32 +178,30 @@
 				return cat;
 			},
 			submit () {
-				console.log(this.date, this.type, this.selectedcat, this.title, this.sum, this.defaultcurrency);
 				var currency = 0;
-				var datasend = {
-
-				};
-				datasend.type  = this.type;
-				datasend.title = this.title;
-				datasend.date  = this.date;
+				var datasend = {};
+				var validate = true;
+				datasend.type     = this.type;
+				datasend.title    = this.title;
+				datasend.date     = this.date;
+				datasend.category = this.selectedcat;
 				if(this.defaultcurrency != 'UAH' && this.currencies[this.defaultcurrency]){
 					currency = this.currencies[this.defaultcurrency].buy;
 				}
-				console.log(currency);
+				datasend.sum = this.sum;
 				if(currency !== 0){
 					datasend.sum = this.sum*currency;
 				}
-				console.log(datasend.sum);
-				// axios.get('http://vue/backend/income_costs/add', {					
-				// 	date: this.date,
-				// 	type: this.selected,
-				// })
-				// .then(response => {		
-				// 	console.log(response.data);	
-				// })			
+				if(validate === true){
+					axios.get('http://vue/backend/income_costs/add', {
+						params:datasend
+					})
+					.then(response => {		
+						console.log(response.data);	
+					})
+				}
 			},
 			checkNote: function() {
-				console.log(this.type);
 				return this.type;
 			},
 			checkCI: function() {

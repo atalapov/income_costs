@@ -1,7 +1,7 @@
 <template>
 	<v-app>
 		<v-content>
-			<add-operation data-app></add-operation>
+			<router-view></router-view>
 		</v-content>
 	</v-app>
 </template>

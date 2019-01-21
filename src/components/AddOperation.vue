@@ -76,7 +76,6 @@
 
 <script>	
 	export default {
-		name: 'AddPayment',
 		data: function() {	
 			return {
 				currencies:{},				

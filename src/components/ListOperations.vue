@@ -22,7 +22,7 @@
 					vertical
 					></v-divider>					
 					<v-spacer></v-spacer>
-					<v-dialog v-model="dialogcash" persistent max-width="500px">
+					<v-dialog v-model="dialogcash" persistent max-width="800px">
 						<v-btn slot="activator" color="primary" dark class="mb-2">Добавить кошелек</v-btn>
 						<v-card>
 							<v-toolbar dark color="primary">
@@ -30,7 +30,7 @@
 									<v-icon>close</v-icon>
 								</v-btn>
 							</v-toolbar>
-							<add-cash></add-cash>
+							<add-safe></add-safe>
 						</v-card>
 					</v-dialog>
 				</v-toolbar>

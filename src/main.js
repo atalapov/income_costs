@@ -6,7 +6,7 @@ import axios from 'axios'
 import VueRouter from 'vue-router'
 import App from './App.vue'
 import AddOperation from './components/AddOperation.vue'
-import AddCash from './components/AddCash.vue'
+import AddSafe from './components/AddSafe.vue'
 import Routes from './routes'
 
 window.axios = require('axios');
@@ -14,7 +14,7 @@ Vue.use(Vuex);
 Vue.use(Vuetify);
 Vue.use(VueRouter);
 Vue.component('AddOperation', AddOperation);
-Vue.component('AddCash', AddCash);
+Vue.component('AddSafe', AddSafe);
 
 const router = new VueRouter({
   routes: Routes,

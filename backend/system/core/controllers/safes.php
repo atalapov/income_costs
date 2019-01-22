@@ -8,7 +8,7 @@
 /**
  * 
  */
-class income_costs
+class safes
 {
 	
 	public function __construct()
@@ -19,9 +19,9 @@ class income_costs
 	public static function list($param = array())
 	{
 		global $db;
-        $income_costs = $db->get('income_costs');
+        $safes = $db->get('safes');
 		$obj = $param["_response"];
-        $obj->response($obj->json($income_costs),200);
+        $obj->response($obj->json($safes),200);
 	}
 	public static function add($param = array())
 	{
@@ -29,12 +29,10 @@ class income_costs
         $obj = $param["_response"];
         $data = $param["data"];
         if(!empty($data)){
-	        if(isset($data['date'])) {
-	        	$data['date'] = date('Y-m-d H:i:s',strtotime($data['date']));
-	        }else{
-	        	$data['date'] = date('Y-m-d H:i:s');
+	        if(!isset($data['slug'])) {
+	        	$data['slug'] = apply_filters('string_to_slug', $data['title']);
 	        }
-	        $id = $db->insert('income_costs', $data);
+	        $id = $db->insert('safes', $data);
 	        $dataout = array(
 	        	'id' => $id
 	        );
@@ -53,4 +51,4 @@ class income_costs
 // function income_costs_items($param){
 // 	var_dump($param);
 // }
-$income_costs = new income_costs();
+$safes = new safes();

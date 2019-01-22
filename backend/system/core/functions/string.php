@@ -71,6 +71,15 @@ class Text
 	}
 }
 add_filter( 'string_to_slug', 'string_to_slug', 10, 1 );
+add_filter( 'before_return_dataout', 'before_return_dataout_string', 10 );
+function before_return_dataout_string($outdata){
+    if(isset($outdata['data'])){
+        if(isset($outdata['data']['slug'])){
+            $outdata['dataout']['slug'] = $outdata['data']['slug'];
+        }
+    }
+    return $outdata;
+}
 function string_to_slug($text){
 	$Text = new Text();
     $text = $Text->text_to_slug($text);

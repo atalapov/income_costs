@@ -34,8 +34,19 @@ class categories
 	        }else{
 	        	$data['date'] = date('Y-m-d H:i:s');
 	        }
+	        if(!isset($data['slug'])) {
+	        	$data['slug'] = apply_filters('string_to_slug',$data['title']);
+	        }
 	        $id = $db->insert('categories', $data);
-        	$obj->response($obj->json(array('id'=>$id)),200);
+	        $dataout = array(
+	        	'id' => $id
+	        );
+	        $outdata = array(
+	        	'dataout' => $dataout,
+	        	'data'    => $data
+	        );
+	        $outdata = apply_filters('before_return_dataout', $outdata );
+        	$obj->response( $obj->json($outdata['dataout']) ,200);
         }else{
         	$obj->response($obj->json(array('error'=>'Data can\'t be empty!' )),404);
         }

@@ -9,16 +9,18 @@
 					inset
 					vertical
 					></v-divider>
+					<v-toolbar-title>USD: {{usdbuy}} / {{usdsale}}</v-toolbar-title>
+					<v-toolbar-title>RUR: {{rurbuy}} / {{rursale}}</v-toolbar-title>
 				</v-toolbar>
 			</v-flex>
 			<v-flex xs6>
 				<v-toolbar flat color="white">
-					<v-toolbar-title>Список кошельков</v-toolbar-title>
+					<v-toolbar-title>Список кошельков:</v-toolbar-title>
 					<v-divider
 					class="mx-2"
 					inset
 					vertical
-					></v-divider>
+					></v-divider>					
 					<v-spacer></v-spacer>
 					<v-dialog v-model="dialogcash" persistent max-width="500px">
 						<v-btn slot="activator" color="primary" dark class="mb-2">Добавить кошелек</v-btn>
@@ -28,6 +30,7 @@
 									<v-icon>close</v-icon>
 								</v-btn>
 							</v-toolbar>
+							<add-cash></add-cash>
 						</v-card>
 					</v-dialog>
 				</v-toolbar>
@@ -109,6 +112,10 @@
 <script>
 	export default {
 		data: () => ({
+			usdbuy:'',
+			usdsale:'',
+			rurbuy:'',
+			rursale:'',
 			currencies:{},	
 			currencieslist:new Array(),
 			search: '',
@@ -153,13 +160,22 @@
 					self.currencies[smdata.ccy].sale = smdata.sale;
 					var currencies = this.currencies;
 					self.currencieslist.push(this.currencies[smdata.ccy]);
-				}			
+				}
+				self.usdbuy = self.currencies.USD.buy;
+				self.usdsale = self.currencies.USD.sale;	
+				self.rurbuy = self.currencies.RUR.buy;
+				self.rursale = self.currencies.RUR.sale;
+
+				self.usdbuy = parseFloat(self.usdbuy).toFixed(2);
+				self.usdsale = parseFloat(self.usdsale).toFixed(2);
+				self.rurbuy = parseFloat(self.rurbuy).toFixed(2);
+				self.rursale = parseFloat(self.rursale).toFixed(2);
 			})
 		},
 		computed: {
 			formTitle () {
 				return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
-			}
+			}			
 		},
 
 		watch: {
@@ -177,8 +193,8 @@
 
 		methods: {
 			initialize () {
-				axios.get('http://vue/backend/categories/list').then(response => {
-					this.operations = response.data;
+				axios.get('http://vue/backend/income_costs/list').then(response => {
+					this.operations = response.data;					
 				});
 			},
 			editItem (item) {
@@ -209,6 +225,7 @@
 				}
 				this.close()
 			}
+
 		}
 	}
 </script>

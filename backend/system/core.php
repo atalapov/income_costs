@@ -72,10 +72,11 @@ class Core{
 
     public function add_core_functions()
     {
+        $this->load('core'.DIRECTORY_SEPARATOR.'functions'.DIRECTORY_SEPARATOR.'hooks.php',array(),'core');
         $folder = $this->corepath.'core'.DIRECTORY_SEPARATOR.'functions';
         $files = scandir($folder);
         foreach ($files as $file) {
-            $file = ($file != '.' && $file !='..' && $file != 'index.php' && strpos($file,'.php') > 0) ? $file : '';
+            $file = ($file != '.' && $file !='..' && $file != 'index.php' && $file != 'hooks.php' && strpos($file,'.php') > 0) ? $file : '';
             if(!empty($file) && is_file($folder.DIRECTORY_SEPARATOR.$file)){
                 require_once $folder.DIRECTORY_SEPARATOR.$file;
             }

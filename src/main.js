@@ -10,11 +10,7 @@ import Routes from './routes'
 
 window.axios = require('axios');
 Vue.use(Vuex);
-Vue.use(Vuetify, {
-	options: {
-		customProperties: true
-	}
-});
+Vue.use(Vuetify);
 Vue.use(VueRouter);
 Vue.component('AddOperation', AddOperation);
 

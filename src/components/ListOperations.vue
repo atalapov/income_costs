@@ -1,6 +1,37 @@
 <template>
 	<v-container grid-list-md text-xs-center>
 		<v-layout row wrap>
+			<v-flex xs6>
+				<v-toolbar flat color="white">
+					<v-toolbar-title>Курс валют:</v-toolbar-title>
+					<v-divider
+					class="mx-2"
+					inset
+					vertical
+					></v-divider>
+				</v-toolbar>
+			</v-flex>
+			<v-flex xs6>
+				<v-toolbar flat color="white">
+					<v-toolbar-title>Список кошельков</v-toolbar-title>
+					<v-divider
+					class="mx-2"
+					inset
+					vertical
+					></v-divider>
+					<v-spacer></v-spacer>
+					<v-dialog v-model="dialogcash" persistent max-width="500px">
+						<v-btn slot="activator" color="primary" dark class="mb-2">Добавить кошелек</v-btn>
+						<v-card>
+							<v-toolbar dark color="primary">
+								<v-btn icon dark @click="dialogcash = false">
+									<v-icon>close</v-icon>
+								</v-btn>
+							</v-toolbar>
+						</v-card>
+					</v-dialog>
+				</v-toolbar>
+			</v-flex>
 			<v-flex xs12>
 				<div>
 					<v-toolbar flat color="white">
@@ -23,28 +54,29 @@
 							<v-btn slot="activator" color="primary" dark class="mb-2">Добавить операцию</v-btn>
 							<v-card>
 								<v-toolbar dark color="primary">
-								<v-btn icon dark @click="dialog = false">
-									<v-icon>close</v-icon>
-								</v-btn>
-							</v-toolbar>
+									<v-btn icon dark @click="dialog = false">
+										<v-icon>close</v-icon>
+									</v-btn>
+								</v-toolbar>
 								<add-operation></add-operation>
 							</v-card>
 						</v-dialog>
 					</v-toolbar>
 					<v-data-table
 					:headers="headers"
-					:items="desserts"
+					:items="operations"
 					:search="search"
 					:rows-per-page-items="rowsPerPageItems"
 					:rows-per-page-text="rowsPerPageText"					
 					class="maintable"
 					>
 					<template slot="items" slot-scope="props">
-						<td class="text-xs-left">{{ props.item.name }}</td>
-						<td class="text-xs-left">{{ props.item.calories }}</td>
-						<td class="text-xs-left">{{ props.item.fat }}</td>
-						<td class="text-xs-left">{{ props.item.carbs }}</td>
-						<td class="text-xs-left">{{ props.item.protein }}</td>
+						<td class="text-xs-left">{{ props.item.title }}</td>
+						<td class="text-xs-left">{{ props.item.type }}</td>
+						<td class="text-xs-left">{{ props.item.category }}</td>
+						<td class="text-xs-left">{{ props.item.date }}</td>
+						<td class="text-xs-left">{{ props.item.sum }}</td>
+						<td class="text-xs-left">{{ props.item.ccy }}</td>
 						<td class="justify-center layout px-0">
 							<v-icon
 							small
@@ -77,19 +109,22 @@
 <script>
 	export default {
 		data: () => ({
+			currencies:{},	
+			currencieslist:new Array(),
 			search: '',
 			dialog: false,
+			dialogcash: false,
 			rowsPerPageItems: [5, 10],
 			rowsPerPageText: 'Отображать по:',
 			headers: [
-			{ text: 'Название операции', value: 'name'},
-			{ text: 'Calories', value: 'calories' },
-			{ text: 'Fat (g)', value: 'fat' },
-			{ text: 'Carbs (g)', value: 'carbs' },
-			{ text: 'Protein (g)', value: 'protein' },
-			{ text: 'Actions', value: 'name', sortable: false }
+			{ text: 'Название операции', value: 'title'},
+			{ text: 'Тип операции', value: 'type' },
+			{ text: 'Категория', value: 'category' },
+			{ text: 'Дата добавления', value: 'date' },
+			{ text: 'Сумма', value: 'sum' },
+			{ text: 'Валюта', value: 'ccy'}
 			],
-			desserts: [],
+			operations: [],
 			editedIndex: -1,
 			editedItem: {
 				name: '',
@@ -106,7 +141,21 @@
 				protein: 0
 			}
 		}),
-
+		mounted: function() {
+			var self = this;
+			axios.get('https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5')
+			.then(response => {
+				for (var k in response.data) {
+					var smdata = response.data[k];				
+					self.currencies[smdata.ccy] = {};
+					self.currencies[smdata.ccy].ccy  = smdata.ccy;
+					self.currencies[smdata.ccy].buy  = smdata.buy;
+					self.currencies[smdata.ccy].sale = smdata.sale;
+					var currencies = this.currencies;
+					self.currencieslist.push(this.currencies[smdata.ccy]);
+				}			
+			})
+		},
 		computed: {
 			formTitle () {
 				return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
@@ -115,6 +164,9 @@
 
 		watch: {
 			dialog (val) {
+				val || this.close()
+			},
+			dialogcash (val) {
 				val || this.close()
 			}
 		},
@@ -125,80 +177,10 @@
 
 		methods: {
 			initialize () {
-				this.desserts = [
-				{
-					name: 'Frozen Yogurt',
-					calories: 159,
-					fat: 6.0,
-					carbs: 24,
-					protein: 4.0
-				},
-				{
-					name: 'Ice cream sandwich',
-					calories: 237,
-					fat: 9.0,
-					carbs: 37,
-					protein: 4.3
-				},
-				{
-					name: 'Eclair',
-					calories: 262,
-					fat: 16.0,
-					carbs: 23,
-					protein: 6.0
-				},
-				{
-					name: 'Cupcake',
-					calories: 305,
-					fat: 3.7,
-					carbs: 67,
-					protein: 4.3
-				},
-				{
-					name: 'Gingerbread',
-					calories: 356,
-					fat: 16.0,
-					carbs: 49,
-					protein: 3.9
-				},
-				{
-					name: 'Jelly bean',
-					calories: 375,
-					fat: 0.0,
-					carbs: 94,
-					protein: 0.0
-				},
-				{
-					name: 'Lollipop',
-					calories: 392,
-					fat: 0.2,
-					carbs: 98,
-					protein: 0
-				},
-				{
-					name: 'Honeycomb',
-					calories: 408,
-					fat: 3.2,
-					carbs: 87,
-					protein: 6.5
-				},
-				{
-					name: 'Donut',
-					calories: 452,
-					fat: 25.0,
-					carbs: 51,
-					protein: 4.9
-				},
-				{
-					name: 'KitKat',
-					calories: 518,
-					fat: 26.0,
-					carbs: 65,
-					protein: 7
-				}
-				]
+				axios.get('http://vue/backend/categories/list').then(response => {
+					this.operations = response.data;
+				});
 			},
-
 			editItem (item) {
 				this.editedIndex = this.desserts.indexOf(item)
 				this.editedItem = Object.assign({}, item)
@@ -212,6 +194,7 @@
 
 			close () {
 				this.dialog = false
+				this.dialogcash = false
 				setTimeout(() => {
 					this.editedItem = Object.assign({}, this.defaultItem)
 					this.editedIndex = -1

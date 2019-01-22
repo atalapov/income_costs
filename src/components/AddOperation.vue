@@ -2,7 +2,6 @@
 	<v-container grid-list-md text-xs-center>
 		<v-layout row wrap>
 			<v-flex xs12 sm6 offset-sm3>
-				<h3 class="font-weight-light">Курс валют:</h3>
 				<h1 class="font-weight-light mb-20">Нужно заполнить форму для добавления операции</h1>
 				<v-card>
 					<v-flex xs12 md10 offset-md1>					
@@ -63,8 +62,7 @@
 								<v-text-field placeholder="Введите сумму" name="summary" v-model="sum"></v-text-field>	
 								<div>
 									<v-btn color="warning" @click="submit">Отправить</v-btn>
-								</div>
-								
+								</div>								
 							</div>
 						</v-form>
 					</v-flex>
@@ -77,10 +75,8 @@
 <script>	
 	export default {
 		data: function() {	
-			return {
-				currencies:{},				
-				categories:{},		
-				currencieslist:new Array(),
+			return {							
+				categories:{},				
 				date: new Date().toISOString().substr(0, 10),
 				title: '',
 				sum:'',
@@ -125,18 +121,6 @@
 			axios.get('http://vue/backend/categories/list').then(response => {
 				self.categories = response.data;
 			});
-			axios.get('https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5')
-			.then(response => {
-				for (var k in response.data) {
-					var smdata = response.data[k];				
-					self.currencies[smdata.ccy] = {};
-					self.currencies[smdata.ccy].ccy  = smdata.ccy;
-					self.currencies[smdata.ccy].buy  = smdata.buy;
-					self.currencies[smdata.ccy].sale = smdata.sale;
-					var currencies = this.currencies;
-					self.currencieslist.push(this.currencies[smdata.ccy]);
-				}			
-			})
 		},
 		methods: {
 			updateCategories: function() {
@@ -177,20 +161,15 @@
 				return cat;
 			},
 			submit () {
-				var currency = 0;
 				var datasend = {};
 				var validate = true;
 				datasend.type     = this.type;
 				datasend.title    = this.title;
 				datasend.date     = this.date;
 				datasend.category = this.selectedcat;
-				if(this.defaultcurrency != 'UAH' && this.currencies[this.defaultcurrency]){
-					currency = this.currencies[this.defaultcurrency].buy;
-				}
 				datasend.sum = this.sum;
-				if(currency !== 0){
-					datasend.sum = this.sum*currency;
-				}
+				datasend.ccy = this.defaultcurrency;
+
 				if(validate === true){
 					axios.get('http://vue/backend/income_costs/add', {
 						params:datasend

@@ -29,6 +29,7 @@
 								<v-btn icon dark @click="dialogcash = false">
 									<v-icon>close</v-icon>
 								</v-btn>
+								<v-toolbar-title>Добавление кошелька</v-toolbar-title>
 							</v-toolbar>
 							<add-safe></add-safe>
 						</v-card>
@@ -132,6 +133,7 @@
 			{ text: 'Валюта', value: 'ccy'}
 			],
 			operations: [],
+			safes:[],
 			editedIndex: -1,
 			editedItem: {
 				name: '',
@@ -195,6 +197,9 @@
 			initialize () {
 				axios.get('http://vue/backend/income_costs/list').then(response => {
 					this.operations = response.data;					
+				});
+				axios.get('http://vue/backend/safes/list').then(response => {
+					this.safes = response.data;					
 				});
 			},
 			editItem (item) {

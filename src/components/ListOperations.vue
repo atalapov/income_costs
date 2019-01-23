@@ -35,76 +35,101 @@
 						</v-card>
 					</v-dialog>
 				</v-toolbar>
-			</v-flex>
-			<v-flex xs12>
-				<div>
-					<v-toolbar flat color="white">
-						<v-toolbar-title>Список операций</v-toolbar-title>
-						<v-divider
-						class="mx-2"
-						inset
-						vertical
-						></v-divider>
-						<v-spacer></v-spacer>
-						<v-text-field
-						v-model="search"
-						append-icon="search"
-						label="Поиск"
-						single-line
-						hide-details
-						></v-text-field>
-						<v-spacer></v-spacer>
-						<v-dialog v-model="dialog" persistent fullscreen>
-							<v-btn slot="activator" color="primary" dark class="mb-2">Добавить операцию</v-btn>
-							<v-card>
-								<v-toolbar dark color="primary">
-									<v-btn icon dark @click="dialog = false">
-										<v-icon>close</v-icon>
-									</v-btn>
-								</v-toolbar>
-								<add-operation></add-operation>
-							</v-card>
-						</v-dialog>
+
+
+				<v-data-table
+				:headers="headersafes"
+				:items="safes"
+				:search="search"
+				:rows-per-page-items="rowsPerPageItems"
+				:rows-per-page-text="rowsPerPageText"	
+				hide-actions				
+				class="safestable"
+				>
+				<template slot="items" slot-scope="props">
+					<td class="text-xs-left">{{ props.item.title }}</td>
+					<td class="text-xs-left">{{ props.item.ccy }}</td>
+					<td class="text-xs-left">{{ props.item.money }}</td>
+		</template>
+		<template slot="pageText" slot-scope="item">
+			{{item.pageStart}} - {{item.pageStop}} из {{item.itemsLength}}
+		</template>
+		<template slot="no-data">
+			<v-btn color="primary" @click="initialize">Reset</v-btn>
+		</template>
+	</v-data-table>
+
+
+</v-flex>
+<v-flex xs12>
+	<div>
+		<v-toolbar flat color="white">
+			<v-toolbar-title>Список операций</v-toolbar-title>
+			<v-divider
+			class="mx-2"
+			inset
+			vertical
+			></v-divider>
+			<v-spacer></v-spacer>
+			<v-text-field
+			v-model="search"
+			append-icon="search"
+			label="Поиск"
+			single-line
+			hide-details
+			></v-text-field>
+			<v-spacer></v-spacer>
+			<v-dialog v-model="dialog" persistent fullscreen>
+				<v-btn slot="activator" color="primary" dark class="mb-2">Добавить операцию</v-btn>
+				<v-card>
+					<v-toolbar dark color="primary">
+						<v-btn icon dark @click="dialog = false">
+							<v-icon>close</v-icon>
+						</v-btn>
 					</v-toolbar>
-					<v-data-table
-					:headers="headers"
-					:items="operations"
-					:search="search"
-					:rows-per-page-items="rowsPerPageItems"
-					:rows-per-page-text="rowsPerPageText"					
-					class="maintable"
-					>
-					<template slot="items" slot-scope="props">
-						<td class="text-xs-left">{{ props.item.title }}</td>
-						<td class="text-xs-left">{{ props.item.type }}</td>
-						<td class="text-xs-left">{{ props.item.category }}</td>
-						<td class="text-xs-left">{{ props.item.date }}</td>
-						<td class="text-xs-left">{{ props.item.sum }}</td>
-						<td class="text-xs-left">{{ props.item.ccy }}</td>
-						<td class="justify-center layout px-0">
-							<v-icon
-							small
-							class="mr-2"
-							@click="editItem(props.item)"
-							>
-							edit
-						</v-icon>
-						<v-icon
-						small
-						@click="deleteItem(props.item)"
-						>
-						delete
-					</v-icon>
-				</td>
-			</template>
-			<template slot="pageText" slot-scope="item">
-				{{item.pageStart}} - {{item.pageStop}} из {{item.itemsLength}}
-			</template>
-			<template slot="no-data">
-				<v-btn color="primary" @click="initialize">Reset</v-btn>
-			</template>
-		</v-data-table>
-	</div>
+					<add-operation></add-operation>
+				</v-card>
+			</v-dialog>
+		</v-toolbar>
+		<v-data-table
+		:headers="headers"
+		:items="operations"
+		:search="search"
+		:rows-per-page-items="rowsPerPageItems"
+		:rows-per-page-text="rowsPerPageText"					
+		class="maintable"
+		>
+		<template slot="items" slot-scope="props">
+			<td class="text-xs-left">{{ props.item.title }}</td>
+			<td class="text-xs-left">{{ props.item.type }}</td>
+			<td class="text-xs-left">{{ props.item.category }}</td>
+			<td class="text-xs-left">{{ props.item.date }}</td>
+			<td class="text-xs-left">{{ props.item.sum }}</td>
+			<td class="text-xs-left">{{ props.item.ccy }}</td>
+			<td class="justify-center layout px-0">
+				<v-icon
+				small
+				class="mr-2"
+				@click="editItem(props.item)"
+				>
+				edit
+			</v-icon>
+			<v-icon
+			small
+			@click="deleteItem(props.item)"
+			>
+			delete
+		</v-icon>
+	</td>
+</template>
+<template slot="pageText" slot-scope="item">
+	{{item.pageStart}} - {{item.pageStop}} из {{item.itemsLength}}
+</template>
+<template slot="no-data">
+	<v-btn color="primary" @click="initialize">Reset</v-btn>
+</template>
+</v-data-table>
+</div>
 </v-flex>
 </v-layout>
 </v-container>
@@ -131,6 +156,11 @@
 			{ text: 'Дата добавления', value: 'date' },
 			{ text: 'Сумма', value: 'sum' },
 			{ text: 'Валюта', value: 'ccy'}
+			],
+			headersafes: [
+			{ text: 'Название кошелька', value: 'title'},
+			{ text: 'Валюта', value: 'ccy'},
+			{ text: 'Сумма на счету', value: 'sum' }
 			],
 			operations: [],
 			safes:[],

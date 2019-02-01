@@ -58,11 +58,16 @@
 								<h2 class="font-weight-light toleft">Выберите валюту:</h2>
 								<v-select :items="incomecurrency" item-text="type" item-value="value" v-model="defaultcurrency" >	
 								</v-select>
-								<h2 class="font-weight-light toleft">Сумма:</h2>
-								<v-text-field placeholder="Введите сумму" name="summary" v-model="sum"></v-text-field>	
-								<div>
-									<v-btn color="warning" @click="submit">Отправить</v-btn>
-								</div>								
+								<h2 class="font-weight-light toleft">Выберите кошелек:</h2>
+								<v-select :items="listwalletsarr" item-text="type" item-value="value" v-model="defaultwallet" >	
+								</v-select>
+								<div v-if="checkWal()">
+									<h2 class="font-weight-light toleft">Сумма:</h2>
+									<v-text-field placeholder="Введите сумму" name="summary" v-model="sum"></v-text-field>	
+									<div>
+										<v-btn color="warning" @click="submit">Отправить</v-btn>
+									</div>		
+								</div>						
 							</div>
 						</v-form>
 					</v-flex>
@@ -76,11 +81,17 @@
 	export default {
 		data: function() {	
 			return {							
-				categories:{},				
+				categories:{},	
 				date: new Date().toISOString().substr(0, 10),
 				title: '',
 				sum:'',
-				menu: false,
+				menu: false,						
+				defaultwallet: {
+					type: 'Выберите кошелек',
+					value: false
+				},
+				listwallets: {},
+				listwalletsarr: [],
 				defaultcurrency: {
 					type:'UAH',
 					value:'UAH'
@@ -112,6 +123,9 @@
 			},
 		},
 		watch: {
+			listwallets: function(val){
+				this.updateListwallets();
+			},
 			categories: function(val){
 				this.updateCategories();
 			}
@@ -121,8 +135,26 @@
 			axios.get('http://vue/backend/categories/list').then(response => {
 				self.categories = response.data;
 			});
+			axios.get('http://vue/backend/safes/list').then(response => {
+				self.listwallets = response.data;
+			});
 		},
 		methods: {
+			updateListwallets: function() {
+				this.listwalletsarr = [];
+				this.listwalletsarr.push(this.defaultwallet);
+				for (var i in this.listwallets) {
+					if(this.listwallets[i]){
+						if(this.listwallets[i].title && this.listwallets[i].ccy){
+							var wallet = {
+								type:this.listwallets[i].title,
+								value:this.listwallets[i].ccy,
+							}
+							this.listwalletsarr.push(wallet);
+						}
+					}
+				}
+			},
 			updateCategories: function() {
 				var cat = this.categories;
 				this.operationitems = [];
@@ -184,6 +216,13 @@
 			},
 			checkCI: function() {
 				return this.selectedcat;
+			},
+			checkWal: function() {
+				if(typeof this.defaultwallet == 'object'){
+					return (this.defaultwallet.value != false);
+				}else{
+					return (this.defaultwallet != false);
+				}
 			},
 			formatDate (date) {
 				if (!date) return null

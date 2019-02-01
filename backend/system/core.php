@@ -84,11 +84,9 @@ class Core{
     }
     public function load_controller($file = "")
     {
-        if(!empty($file)){
-            $folder = $this->corepath.'core'.DIRECTORY_SEPARATOR.'controllers';
-            if(!empty($file) && is_file($folder.DIRECTORY_SEPARATOR.$file)){
-                require_once $folder.DIRECTORY_SEPARATOR.$file;
-            }
+        $folder = $this->corepath.'core'.DIRECTORY_SEPARATOR.'controllers';
+        if(!empty($file) && is_file($folder.DIRECTORY_SEPARATOR.$file.".php")){
+            require_once $folder.DIRECTORY_SEPARATOR.$file.".php";
         }
     }
     public function run_api()

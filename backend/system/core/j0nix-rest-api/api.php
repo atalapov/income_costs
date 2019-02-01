@@ -55,6 +55,9 @@ class API extends REST {
             unset($param["rquest"]);
 			$param['data']    = $param;
 			$param['_response'] = $this;
+			$GLOBALS['api'] = $this;
+			global $core;
+			$core->load_controller($rquest[0]);
 			do_action("{$rquest[0]}_{$rquest[1]}", $param);
 		}
 	}

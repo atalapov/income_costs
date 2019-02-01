@@ -81,10 +81,11 @@ class Core{
                 require_once $folder.DIRECTORY_SEPARATOR.$file;
             }
         }
-        $folder = $this->corepath.'core'.DIRECTORY_SEPARATOR.'controllers';
-        $files = scandir($folder);
-        foreach ($files as $file) {
-            $file = ($file != '.' && $file !='..' && $file != 'index.php' && strpos($file,'.php') > 0) ? $file : '';
+    }
+    public function load_controller($file = "")
+    {
+        if(!empty($file)){
+            $folder = $this->corepath.'core'.DIRECTORY_SEPARATOR.'controllers';
             if(!empty($file) && is_file($folder.DIRECTORY_SEPARATOR.$file)){
                 require_once $folder.DIRECTORY_SEPARATOR.$file;
             }
